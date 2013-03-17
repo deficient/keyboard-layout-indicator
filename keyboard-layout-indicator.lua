@@ -48,6 +48,8 @@ function indicator:set(i)
         end
     end
     os.execute( cmd )
+
+    os.execute("xmodmap ~/.Xmodmap")
 end
 
 function indicator:setcustom(str)
