@@ -3,6 +3,9 @@ local wibox = require("wibox")
 
 -- Keyboard Layout Switcher
 -- Keyboard map indicator and changer
+
+-- indicator.mt: module (class) metatable
+-- indicator.wmt: widget (instance) metatable
 local indicator = { mt = {}, wmt = {} }
 indicator.wmt.__index = indicator
 
@@ -60,10 +63,12 @@ end
 function indicator:update()
     -- update widget text
     local text = self.current.name
-    if self.current.color then
-        text = fg(self.current.color, text)
+    if self.current.color and self.current.color ~= nil then
+        markup = '<span color="' .. self.current.color .. '">' .. text ..'</span>'
+        self.widget:set_markup(markup)
+    else
+        self.widget:set_text(text)
     end
-    self.widget:set_text(text)
 end
 
 function indicator:get(i)
