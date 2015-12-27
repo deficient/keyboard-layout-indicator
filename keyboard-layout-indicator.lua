@@ -9,6 +9,33 @@ local wibox = require("wibox")
 local indicator = { mt = {}, wmt = {} }
 indicator.wmt.__index = indicator
 
+
+local function trim(s)
+  if s == nil then return nil end
+  -- from PiL2 20.4
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+local function findindex(array, match)
+    for k,v in pairs(array) do
+        if match(v) then
+            return k
+        end
+    end
+    return nil
+end
+
+local function readall(file)
+    local text = file:read('*all')
+    file:close()
+    return text
+end
+
+local function readcommand(command)
+    return readall(io.popen(command))
+end
+
+
 function indicator.new(args)
     local sw = setmetatable({}, indicator.wmt)
 
