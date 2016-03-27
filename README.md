@@ -62,6 +62,15 @@ for s = 1, screen.count() do
 
     mywibox[s]:set_widget(layout)
 end
+
+
+-- Add bindings
+local globalkeys = awful.util.table.join(
+    ...
+    awful.key({ "Shift"         }, "Shift_R", function() kbdcfg:next() end ),
+    awful.key({ "Mod4", "Shift" }, "Shift_R", function() kbdcfg:prev() end ),
+    ...
+)
 ```
 
 
