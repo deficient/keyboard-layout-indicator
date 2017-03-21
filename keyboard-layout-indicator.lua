@@ -42,29 +42,31 @@ end
 local indicator = {}
 
 function indicator:new(args)
-    local sw = setmetatable({}, {__index = self})
+    return setmetatable({}, {__index = self}):init(args)
+end
 
-    sw.cmd = "setxkbmap"
-    sw.layouts = args.layouts
+function indicator:init(args)
+    self.cmd = "setxkbmap"
+    self.layouts = args.layouts
 
-    sw.index = 1     -- 1-based index!
-    sw.current = nil
+    self.index = 1     -- 1-based index!
+    self.current = nil
 
-    sw.widget = wibox.widget.textbox()
-    sw.widget.set_align("right")
+    self.widget = wibox.widget.textbox()
+    self.widget.set_align("right")
 
-    sw.widget:buttons(awful.util.table.join(
-        awful.button({ }, 1, function() sw:next() end),
-        awful.button({ }, 3, function() sw:prev() end),
-        awful.button({ }, 4, function() sw:prev() end),
-        awful.button({ }, 5, function() sw:next() end)
+    self.widget:buttons(awful.util.table.join(
+        awful.button({ }, 1, function() self:next() end),
+        awful.button({ }, 3, function() self:prev() end),
+        awful.button({ }, 4, function() self:prev() end),
+        awful.button({ }, 5, function() self:next() end)
     ))
 
-    sw.timer = gears.timer({ timeout = args.timeout or 0.5 })
-    sw.timer:connect_signal("timeout", function() sw:get() end)
-    sw.timer:start()
-    sw:get()
-    return sw
+    self.timer = gears.timer({ timeout = args.timeout or 0.5 })
+    self.timer:connect_signal("timeout", function() self:get() end)
+    self.timer:start()
+    self:get()
+    return self
 end
 
 function indicator:set(i)
