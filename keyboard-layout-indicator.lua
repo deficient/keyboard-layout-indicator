@@ -1,15 +1,13 @@
+-- Keyboard Layout Switcher
+-- Keyboard map indicator and changer
+
 local awful = require("awful")
 local wibox = require("wibox")
 local gears = require("gears")
 
--- Keyboard Layout Switcher
--- Keyboard map indicator and changer
-
--- indicator.mt: module (class) metatable
--- indicator.wmt: widget (instance) metatable
-local indicator = { mt = {}, wmt = {} }
-indicator.wmt.__index = indicator
-
+------------------------------------------
+-- Private utility functions
+------------------------------------------
 
 local function trim(s)
   if s == nil then return nil end
@@ -37,8 +35,14 @@ local function readcommand(command)
 end
 
 
-function indicator.new(args)
-    local sw = setmetatable({}, indicator.wmt)
+------------------------------------------
+-- Indicator class
+------------------------------------------
+
+local indicator = {}
+
+function indicator:new(args)
+    local sw = setmetatable({}, {__index = self})
 
     sw.cmd = "setxkbmap"
     sw.layouts = args.layouts
@@ -132,9 +136,7 @@ function indicator:prev()
     self:set(self.index - 1)
 end
 
-function indicator.mt:__call(...)
-    return indicator.new(...)
-end
-
-return setmetatable(indicator, indicator.mt)
+return setmetatable(indicator, {
+  __call = indicator.new,
+})
 
