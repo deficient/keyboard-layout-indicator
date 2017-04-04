@@ -10,8 +10,7 @@ Drop the script into your awesome config folder. Suggestion:
 
 ```bash
 cd ~/.config/awesome
-git clone git@github.com:thomas-glaessle/awesome.keyboard-layout-indicator.git
-ln -s awesome.keyboard-layout-indicator/keyboard-layout-indicator.lua
+git clone git@github.com:thomas-glaessle/awesome.keyboard-layout-indicator.git keyboard-layout-indicator
 ```
 
 
