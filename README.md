@@ -62,4 +62,4 @@ local globalkeys = awful.util.table.join(
 
 ### Requirements
 
-* [awesome 3.5](http://awesome.naquadah.org/)
+* [awesome 4.0](http://awesome.naquadah.org/) or possibly 3.5
