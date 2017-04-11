@@ -10,7 +10,7 @@ Drop the script into your awesome config folder. Suggestion:
 
 ```bash
 cd ~/.config/awesome
-git clone https://github.com/coldfix/awesome.keyboard-layout-indicator.git keyboard-layout-indicator
+git clone https://github.com/coldfix/awesome-keyboard-layout-indicator.git
 ```
 
 
@@ -20,7 +20,7 @@ In your `rc.lua`:
 
 ```lua
 -- load the widget code
-local layout_indicator = require("keyboard-layout-indicator")
+local layout_indicator = require("awesome-keyboard-layout-indicator")
 
 -- define your layouts
 kbdcfg = layout_indicator({
