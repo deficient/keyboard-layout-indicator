@@ -50,6 +50,8 @@ end
 function indicator:init(args)
     self.cmd = "setxkbmap"
     self.layouts = args.layouts
+    self.prompt = args.prompt or "Run: "
+    self.preset = args.preset or self.cmd .. " "
 
     self.index = 1     -- 1-based index!
     self.current = nil
@@ -61,7 +63,16 @@ function indicator:init(args)
         awful.button({ }, 1, function() self:next() end),
         awful.button({ }, 3, function() self:prev() end),
         awful.button({ }, 4, function() self:prev() end),
-        awful.button({ }, 5, function() self:next() end)
+        awful.button({ }, 5, function() self:next() end),
+        -- execute prompt on middle click:
+        awful.button({ }, 2, function ()
+            awful.prompt.run {
+                prompt       = self.prompt,
+                text         = self.preset,
+                textbox      = awful.screen.focused().mypromptbox.widget,
+                exe_callback = function(cmd) self:setcustom(cmd) end,
+            }
+        end)
     ))
 
     self.timer = timer({ timeout = args.timeout or 0.5 })

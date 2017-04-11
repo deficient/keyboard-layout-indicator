@@ -31,19 +31,6 @@ kbdcfg = layout_indicator({
     }
 })
 
--- optionally add a middle-mouse binding to set a custom layout:
-kbdcfg.widget:buttons(awful.util.table.join(
-    kbdcfg.widget:buttons(),
-    awful.button({ }, 2, 
-        function ()
-            awful.prompt.run(
-                { prompt="Run: ", text="setxkbmap " },
-                mypromptbox[mouse.screen].widget,
-                function(cmd) kbdcfg:setcustom(cmd) end )
-        end)
-))
-
-
 -- add the widget to your wibox
     ...
     right_layout:add(kbdcfg.widget)
@@ -58,6 +45,11 @@ local globalkeys = awful.util.table.join(
     ...
 )
 ```
+
+NOTE: middle click on the widget executes a prompt which lets you set a custom
+keyboard layout. However, this will work only if you assign `s.mypromptbox` as
+in the awesome 4.0 default `rc.lua`. Otherwise, you have to rebind the
+behaviour manually, see the source code.
 
 
 ### Requirements
