@@ -72,9 +72,9 @@ function indicator:init(args)
     ))
 
     self.timer = timer({ timeout = args.timeout or 0.5 })
-    self.timer:connect_signal("timeout", function() self:get() end)
+    self.timer:connect_signal("timeout", function() self:update() end)
     self.timer:start()
-    self:get()
+    self:update()
     return self
 end
 
@@ -82,7 +82,6 @@ function indicator:set(i)
     -- set current index
     self.index = ((i-1)+#(self.layouts)) % #(self.layouts) + 1
     self.current = self.layouts[self.index]
-    self:update()
     -- execute command
     local cmd = self.current.command
     if not self.current.command then
@@ -93,14 +92,18 @@ function indicator:set(i)
     end
     os.execute( cmd )
     os.execute("xmodmap ~/.Xmodmap")
+    self:update()
 end
 
 function indicator:setcustom(str)
     os.execute(str)
-    self:get()
+    self:update()
 end
 
 function indicator:update()
+    local index, info = self:get()
+    self.index = index or self.index
+    self.current = info
     -- update widget text
     local text = self.current.name
     if self.current.color then
@@ -120,19 +123,10 @@ function indicator:get()
     local index = findindex(self.layouts, function (v)
         return v.layout == layout and v.variant == variant
     end)
-    if index then
-        self.index = tonumber(index)
-        self.current = self.layouts[index]
-    else
-        self.current = {color="yellow"}
-        if variant then
-            self.current.name = layout.."/"..variant
-        else
-            self.current.name = layout
-        end
-    end
-    -- update widget
-    self:update()
+    return index, index and self.layouts[tonumber(index)] or {
+        color = "yellow",
+        name  = variant and layout.."/"..variant or layout,
+    }
 end
 
 function indicator:next()
