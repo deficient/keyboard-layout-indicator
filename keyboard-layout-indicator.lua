@@ -12,18 +12,14 @@ local timer = gears.timer or timer
 ------------------------------------------
 
 local function trim(s)
-  if s == nil then return nil end
-  -- from PiL2 20.4
-  return (s:gsub("^%s*(.-)%s*$", "%1"))
+    if s == nil then return nil end
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
 local function findindex(array, match)
-    for k,v in pairs(array) do
-        if match(v) then
-            return k
-        end
+    for k, v in pairs(array) do
+        if match(v) then return k end
     end
-    return nil
 end
 
 local function readall(file)
@@ -88,17 +84,14 @@ function indicator:set(i)
     self.current = self.layouts[self.index]
     self:update()
     -- execute command
-    local cmd
-    if self.current.command then
-        cmd = self.current.command
-    else
+    local cmd = self.current.command
+    if not self.current.command then
         cmd = self.cmd .. " " .. self.current.layout
         if self.current.variant then
             cmd = cmd .. " " .. self.current.variant
         end
     end
     os.execute( cmd )
-
     os.execute("xmodmap ~/.Xmodmap")
 end
 
@@ -110,7 +103,7 @@ end
 function indicator:update()
     -- update widget text
     local text = self.current.name
-    if self.current.color and self.current.color ~= nil then
+    if self.current.color then
         markup = '<span color="' .. self.current.color .. '">' .. text ..'</span>'
         self.widget:set_markup(markup)
     else
@@ -118,26 +111,25 @@ function indicator:update()
     end
 end
 
-function indicator:get(i)
+function indicator:get()
     -- parse current layout from setxkbmap
     local status = readcommand(self.cmd .. " -query")
     local layout = trim(string.match(status, "layout:([^\n]*)"))
     local variant = trim(string.match(status, "variant:([^\n]*)"))
     -- find layout in self.layouts
-    local index = findindex(self.layouts,
-        function (v)
-            return v.layout==layout and v.variant == variant
-        end)
-    if index == nil then
+    local index = findindex(self.layouts, function (v)
+        return v.layout == layout and v.variant == variant
+    end)
+    if index then
+        self.index = tonumber(index)
+        self.current = self.layouts[index]
+    else
         self.current = {color="yellow"}
         if variant then
             self.current.name = layout.."/"..variant
         else
             self.current.name = layout
         end
-    else
-        self.index = tonumber(index)
-        self.current = self.layouts[index]
     end
     -- update widget
     self:update()
@@ -152,6 +144,6 @@ function indicator:prev()
 end
 
 return setmetatable(indicator, {
-  __call = indicator.new,
+    __call = indicator.new,
 })
 
