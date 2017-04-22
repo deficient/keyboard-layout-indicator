@@ -104,14 +104,8 @@ function indicator:update()
     local index, info = self:get()
     self.index = index or self.index
     self.current = info
-    -- update widget text
-    local text = self.current.name
-    if self.current.color then
-        markup = '<span color="' .. self.current.color .. '">' .. text ..'</span>'
-        self.widget:set_markup(markup)
-    else
-        self.widget:set_text(text)
-    end
+    self.widget:set_markup(("<span %s>%s</span>"):format(
+        self.current.attr or "", self.current.name))
 end
 
 function indicator:get()
@@ -124,8 +118,10 @@ function indicator:get()
         return v.layout == layout and v.variant == variant
     end)
     return index, index and self.layouts[tonumber(index)] or {
-        color = "yellow",
-        name  = variant and layout.."/"..variant or layout,
+        attr    = 'color="yellow"',
+        layout  = layout,
+        variant = variant,
+        name    = variant and layout.."/"..variant or layout,
     }
 end
 
