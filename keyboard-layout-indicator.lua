@@ -80,19 +80,13 @@ end
 
 function indicator:set(i)
     -- set current index
-    self.index = ((i-1)+#(self.layouts)) % #(self.layouts) + 1
+    self.index = (i-1) % #(self.layouts) + 1
     self.current = self.layouts[self.index]
+    self:update_text()
     -- execute command
-    local cmd = self.current.command
-    if not self.current.command then
-        cmd = self.cmd .. " " .. self.current.layout
-        if self.current.variant then
-            cmd = cmd .. " " .. self.current.variant
-        end
-    end
-    os.execute( cmd )
+    os.execute(self.current.command or ("%s %s %s"):format(
+        self.cmd, self.current.layout, self.current.variant or ""))
     os.execute("xmodmap ~/.Xmodmap")
-    self:update()
 end
 
 function indicator:setcustom(str)
@@ -104,6 +98,10 @@ function indicator:update()
     local index, info = self:get()
     self.index = index or self.index
     self.current = info
+    self:update_text()
+end
+
+function indicator:update_text()
     self.widget:set_markup(("<span %s>%s</span>"):format(
         self.current.attr or "", self.current.name))
 end
