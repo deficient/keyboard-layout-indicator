@@ -71,6 +71,9 @@ function indicator:init(args)
         end)
     ))
 
+    awesome.connect_signal("xkb::map_changed", function() self:update() end)
+    awesome.connect_signal("xkb::group_changed", function() self:update() end)
+
     self.timer = timer({ timeout = args.timeout or 0.5 })
     self.timer:connect_signal("timeout", function() self:update() end)
     self.timer:start()
