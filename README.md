@@ -28,6 +28,11 @@ kbdcfg = layout_indicator({
         {name="dv",  layout="de",  variant="dvorak"},
         {name="de",  layout="de",  variant=nil},
         {name="us",  layout="us",  variant=nil}
+    },
+    -- optionally, specify commands to be executed after changing layout:
+    post_set_hooks = {
+        "xmodmap ~/.Xmodmap",
+        "setxkbmap -option caps:escape"
     }
 })
 

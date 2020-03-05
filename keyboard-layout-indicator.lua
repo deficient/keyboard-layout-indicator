@@ -48,6 +48,7 @@ function indicator:init(args)
     self.layouts = args.layouts
     self.prompt = args.prompt or "Run: "
     self.preset = args.preset or self.cmd .. " "
+    self.post_set_hooks = args.post_set_hooks or {"xmodmap ~/.Xmodmap"}
 
     self.index = 1     -- 1-based index!
     self.current = nil
@@ -89,7 +90,9 @@ function indicator:set(i)
     -- execute command
     os.execute(self.current.command or ("%s %s %s"):format(
         self.cmd, self.current.layout, self.current.variant or ""))
-    os.execute("xmodmap ~/.Xmodmap")
+    for i, cmd in ipairs(self.post_set_hooks) do
+        os.execute(cmd)
+    end
 end
 
 function indicator:setcustom(str)
