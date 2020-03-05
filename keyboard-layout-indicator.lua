@@ -99,6 +99,7 @@ end
 
 function indicator:update()
     local index, info = self:get()
+    self.known = index ~= nil
     self.index = index or self.index
     self.current = info
     self:update_text()
@@ -127,11 +128,11 @@ function indicator:get()
 end
 
 function indicator:next()
-    self:set(self.index + 1)
+    self:set(self.index + (self.known and 1 or 0))
 end
 
 function indicator:prev()
-    self:set(self.index - 1)
+    self:set(self.index - (self.known and 1 or 0))
 end
 
 return setmetatable(indicator, {
