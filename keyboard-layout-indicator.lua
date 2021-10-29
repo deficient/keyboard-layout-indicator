@@ -41,17 +41,6 @@ local function findindex(array, match)
     end
 end
 
-local function readall(file)
-    local text = file:read('*all')
-    file:close()
-    return text
-end
-
-local function readcommand(command)
-    return readall(io.popen(command))
-end
-
-
 local function spawn_sequential(command, ...)
     if command then
         local args = pack(...)
@@ -142,13 +131,6 @@ end
 function indicator:update_text()
     self.widget:set_markup(("<span %s>%s</span>"):format(
         self.current.attr or "", self.current.name))
-end
-
-function indicator:get()
-    -- Don't use this method! It is here only for backward compatibility, and
-    -- will be removed in a future version.
-    local status = readcommand(self.cmd .. " -query")
-    return self:parse_status(status)
 end
 
 function indicator:get_async(callback)
