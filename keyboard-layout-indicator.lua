@@ -6,6 +6,25 @@ local wibox = require("wibox")
 local gears = require("gears")
 
 local timer = gears.timer or timer
+local spawn = awful.spawn
+
+
+------------------------------------------
+-- Compatibility with Lua <= 5.1
+------------------------------------------
+
+local _unpack = table.unpack or unpack
+
+-- same as table.pack in lua 5.2:
+local function pack(...)
+    return {n = select('#', ...), ...}
+end
+
+-- different from table.unpack in lua.5.2:
+local function unpack(t)
+    return _unpack(t, 1, t.n)
+end
+
 
 ------------------------------------------
 -- Private utility functions
@@ -30,6 +49,18 @@ end
 
 local function readcommand(command)
     return readall(io.popen(command))
+end
+
+
+local function spawn_sequential(command, ...)
+    if command then
+        local args = pack(...)
+        spawn.easy_async(command, function()
+            spawn_sequential(unpack(args))
+        end)
+    else
+        spawn_sequential(...)
+    end
 end
 
 
@@ -88,24 +119,24 @@ function indicator:set(i)
     self.current = self.layouts[self.index]
     self:update_text()
     -- execute command
-    os.execute(self.current.command or ("%s %s %s"):format(
-        self.cmd, self.current.layout, self.current.variant or ""))
-    for i, cmd in ipairs(self.post_set_hooks) do
-        os.execute(cmd)
-    end
+    local command = self.current.command or ("%s %s %s"):format(
+        self.cmd, self.current.layout, self.current.variant or "")
+    spawn_sequential(command, unpack(self.post_set_hooks))
 end
 
 function indicator:setcustom(str)
-    os.execute(str)
-    self:update()
+    spawn.easy_async(str, function()
+        self:update()
+    end)
 end
 
 function indicator:update()
-    local index, info = self:get()
-    self.known = index ~= nil
-    self.index = index or self.index
-    self.current = info
-    self:update_text()
+    self:get_async(function(index, info)
+        self.known = index ~= nil
+        self.index = index or self.index
+        self.current = info
+        self:update_text()
+    end)
 end
 
 function indicator:update_text()
@@ -114,8 +145,20 @@ function indicator:update_text()
 end
 
 function indicator:get()
-    -- parse current layout from setxkbmap
+    -- Don't use this method! It is here only for backward compatibility, and
+    -- will be removed in a future version.
     local status = readcommand(self.cmd .. " -query")
+    return self:parse_status(status)
+end
+
+function indicator:get_async(callback)
+    spawn.easy_async(self.cmd .. " -query", function(status)
+        callback(self:parse_status(status))
+    end)
+end
+
+function indicator:parse_status(status)
+    -- parse current layout from setxkbmap
     local layout = trim(string.match(status, "layout:([^\n]*)"))
     local variant = trim(string.match(status, "variant:([^\n]*)"))
     -- find layout in self.layouts
