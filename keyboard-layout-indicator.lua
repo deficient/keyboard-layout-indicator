@@ -41,14 +41,21 @@ local function findindex(array, match)
     end
 end
 
-local function spawn_sequential(command, ...)
-    if command then
-        local args = pack(...)
-        spawn.easy_async(command, function()
+local function spawn_sequential(...)
+    if select('#', ...) > 0 then
+        local command = select(1, ...)
+        local args = pack(select(2, ...))
+        local exec_tail = function()
             spawn_sequential(unpack(args))
-        end)
-    else
-        spawn_sequential(...)
+        end
+        if type(command) == "function" then
+            command()
+            exec_tail()
+        elseif command == nil then
+            exec_tail()
+        else
+            spawn.easy_async(command, exec_tail)
+        end
     end
 end
 
