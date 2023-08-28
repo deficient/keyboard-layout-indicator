@@ -81,7 +81,6 @@ function indicator:init(args)
     self.current = nil
 
     self.widget = wibox.widget.textbox()
-    self.widget.set_align("right")
 
     self.widget:buttons(awful.util.table.join(
         awful.button({ }, 1, function() self:next() end),
